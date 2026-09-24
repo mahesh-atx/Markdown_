@@ -1,0 +1,220 @@
+/* Base Theme Overrides to match the image precisely */
+body {
+    background-color: #000000; /* Pure black background as seen in image */
+    color: #d1d5db; /* Gray-300 for main text */
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Markdown Content Container Styles */
+#markdown-content {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+#markdown-content p {
+    margin-bottom: 1.25rem;
+    line-height: 1.7;
+    font-size: 0.95rem;
+}
+
+/* ---- Generic markdown element styles (Tailwind preflight resets these,
+   which is why Example.md looked fine but real uploaded files did not) ---- */
+#markdown-content h1,
+#markdown-content h2,
+#markdown-content h3,
+#markdown-content h4,
+#markdown-content h5,
+#markdown-content h6 {
+    color: #fff;
+    font-weight: 700;
+    line-height: 1.3;
+    margin: 1.75rem 0 0.9rem;
+    scroll-margin-top: 1rem;
+}
+#markdown-content h1 { font-size: 1.875rem; padding-bottom: 0.5rem; border-bottom: 1px solid #2a2a2a; }
+#markdown-content h2 { font-size: 1.5rem; padding-bottom: 0.4rem; border-bottom: 1px solid #222; }
+#markdown-content h3 { font-size: 1.25rem; }
+#markdown-content h4 { font-size: 1.1rem; }
+#markdown-content h5 { font-size: 1rem; }
+#markdown-content h6 { font-size: 0.9rem; color: #a0a0a0; text-transform: uppercase; letter-spacing: 0.04em; }
+
+#markdown-content ul,
+#markdown-content ol {
+    margin: 0 0 1.25rem;
+    padding-left: 1.6rem;
+    line-height: 1.7;
+    font-size: 0.95rem;
+}
+#markdown-content ul { list-style: disc outside; }
+#markdown-content ol { list-style: decimal outside; }
+#markdown-content ul ul { list-style: circle; margin-bottom: 0; }
+#markdown-content ul ul ul { list-style: square; }
+#markdown-content ol ol { list-style: lower-alpha; margin-bottom: 0; }
+#markdown-content li { margin: 0.3rem 0; }
+#markdown-content li > ul,
+#markdown-content li > ol { margin-top: 0.3rem; }
+#markdown-content li::marker { color: #888; }
+/* Task lists: - [ ] / - [x] */
+#markdown-content li.task-list-item { list-style: none; margin-left: -1.6rem; }
+#markdown-content ul.contains-task-list { list-style: none; padding-left: 0.2rem; }
+#markdown-content input[type="checkbox"] { accent-color: #ff6b00; margin-right: 0.5rem; width: 0.9rem; height: 0.9rem; vertical-align: baseline; }
+
+#markdown-content a { color: #58a6ff; text-decoration: underline; text-underline-offset: 3px; }
+#markdown-content a:hover { color: #79b8ff; }
+#markdown-content strong { color: #fff; font-weight: 700; }
+#markdown-content em { font-style: italic; }
+#markdown-content del, #markdown-content s { text-decoration: line-through; color: #999; }
+
+#markdown-content blockquote {
+    border-left: 3px solid #3a3a3a;
+    background: #101010;
+    color: #b5b5b5;
+    margin: 1.25rem 0;
+    padding: 0.8rem 1rem;
+    border-radius: 0 12px 12px 0;
+}
+#markdown-content blockquote p:last-child { margin-bottom: 0; }
+
+#markdown-content hr {
+    border: 0;
+    border-top: 1px solid #2a2a2a;
+    margin: 2rem 0;
+}
+
+#markdown-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    border: 1px solid #2a2a2a;
+    margin: 1rem 0;
+    display: block;
+}
+#markdown-content img.md-img-broken {
+    border: 1px dashed #f87171;
+    min-height: 40px;
+    min-width: 40px;
+}
+
+.md-table-wrapper { overflow-x: auto; margin: 1.5rem 0; border: 1px solid #2a2a2a; border-radius: 12px; }
+#markdown-content table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    background: #111;
+    margin: 0;
+}
+#markdown-content thead { background: #1a1a1a; }
+#markdown-content th,
+#markdown-content td {
+    border: 1px solid #2a2a2a;
+    padding: 0.6rem 0.8rem;
+    text-align: left;
+}
+#markdown-content th { color: #fff; font-weight: 600; white-space: nowrap; }
+#markdown-content tbody tr:nth-child(even) { background: #141414; }
+
+#markdown-content kbd {
+    background: #2d2d2d; border: 1px solid #444; border-bottom-width: 2px;
+    border-radius: 6px; padding: 0.1rem 0.4rem; font-size: 0.8em; font-family: ui-monospace, monospace;
+}
+#markdown-content mark { background: #fef08a; color: #111; border-radius: 3px; padding: 0 0.25em; }
+
+/* Custom Prism Syntax Highlighting Colors based on the screenshot */
+code[class*="language-"],
+pre[class*="language-"] {
+    color: #e5e7eb;
+    text-shadow: none;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    direction: ltr;
+    text-align: left;
+    white-space: pre;
+    word-spacing: normal;
+    word-break: normal;
+    tab-size: 4;
+    hyphens: none;
+}
+
+/* Overriding specific token colors to match the image's theme */
+.token.string { color: #a6e22e; } /* Green for strings like "Python Basics" */
+.token.number { color: #fd971f; } /* Orange for numbers like 101 */
+.token.keyword { color: #c678dd; } /* Purple/Pink for keywords like 'for', 'in' */
+.token.operator { color: #888888; } /* Dimmer punctuation */
+.token.punctuation { color: #888888; }
+.token.property { color: #a6e22e; } /* Dictionary keys appear green in the image */
+
+/* Minimal thin scrollbars (sidebar, code blocks, preview) */
+.code-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: #333 transparent;
+}
+.code-scroll::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+}
+.code-scroll::-webkit-scrollbar-track {
+    background: transparent;
+}
+.code-scroll::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 3px;
+}
+.code-scroll::-webkit-scrollbar-thumb:hover {
+    background: #444;
+}
+
+/* Sidebar Tree View connecting lines */
+.tree-line {
+    border-left: 1px solid #2a2a2a;
+    margin-left: 7px;
+    padding-left: 8px;
+}
+
+/* Toast notifications */
+#toast-wrap {
+    pointer-events: none;
+}
+.toast {
+    pointer-events: auto;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    width: 100%;
+    background: #141414;
+    border: 1px solid #2a2a2a;
+    border-radius: 10px;
+    padding: 0.7rem 0.85rem;
+    font-size: 0.82rem;
+    line-height: 1.45;
+    color: #d1d5db;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.toast.toast-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+.toast.toast-out {
+    opacity: 0;
+    transform: translateY(6px);
+}
+.toast i {
+    font-size: 1rem;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+.toast-error {
+    border-color: #5a2a2a;
+}
+.toast-error i {
+    color: #f87171;
+}
+.toast-info i {
+    color: #888;
+}
+.toast-success i {
+    color: #4ade80;
+}
