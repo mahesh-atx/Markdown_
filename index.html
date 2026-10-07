@@ -109,15 +109,21 @@
             </button>
         </div>
 
-        <!-- Current-file breadcrumb (shown when a file is open) -->
+        <!-- Current-file breadcrumb + Download (shown when a file is open) -->
         <div id="file-header" class="hidden flex-shrink-0 border-b border-[#1e1e1e] bg-black">
-            <div class="w-full max-w-4xl mx-auto px-5 sm:px-12 py-2.5 flex items-center gap-1.5 min-w-0 text-[12px] overflow-hidden">
-                <i class="ph-fill ph-file-text text-[#ff6b00] text-sm flex-shrink-0"></i>
-                <span id="file-header-ws" class="text-[#777] truncate flex-shrink-0 max-w-[28%]"></span>
-                <span id="file-header-sep" class="text-[#444] flex-shrink-0">/</span>
-                <span id="file-header-path" class="text-[#666] truncate flex-shrink min-w-0 hidden"></span>
-                <span id="file-header-slash2" class="text-[#444] flex-shrink-0 hidden">/</span>
-                <span id="file-header-name" class="text-[#e0e0e0] font-medium truncate flex-shrink-0 max-w-[45%]"></span>
+            <div class="w-full max-w-4xl mx-auto px-5 sm:px-12 py-2.5 flex items-center justify-between gap-3 min-w-0">
+                <div class="flex items-center gap-1.5 min-w-0 text-[12px] overflow-hidden flex-1">
+                    <i class="ph-fill ph-file-text text-[#ff6b00] text-sm flex-shrink-0"></i>
+                    <span id="file-header-ws" class="text-[#777] truncate flex-shrink-0 max-w-[28%]"></span>
+                    <span id="file-header-sep" class="text-[#444] flex-shrink-0">/</span>
+                    <span id="file-header-path" class="text-[#666] truncate flex-shrink min-w-0 hidden"></span>
+                    <span id="file-header-slash2" class="text-[#444] flex-shrink-0 hidden">/</span>
+                    <span id="file-header-name" class="text-[#e0e0e0] font-medium truncate flex-shrink-0 max-w-[45%]"></span>
+                </div>
+                <button id="file-download-btn" title="Download this file (.md)" class="flex-shrink-0 flex items-center gap-1.5 border border-[#2a2a2a] rounded-full px-3 py-1 text-[12px] font-medium text-gray-300 hover:bg-[#1a1a1a] hover:border-gray-500 hover:text-white transition-all">
+                    <i class="ph ph-download-simple text-[13px]"></i>
+                    <span class="hidden sm:inline">Download .md</span>
+                </button>
             </div>
         </div>
 

@@ -228,3 +228,117 @@ function clearFileHeader() {
   var bar = document.getElementById("file-header");
   if (bar) bar.classList.add("hidden");
 }
+
+// Download current file as .md (Blob + <a download> — works on file://, no server needed).
+// Handles lazy files (folder handles / GitHub URLs) by reading first, then saving.
+function getActiveFileNode() {
+  try {
+    if (typeof activeFileId === "undefined" || !activeFileId) return null;
+    if (typeof findFileById === "function" && typeof fileSystem !== "undefined") {
+      return findFileById(fileSystem, activeFileId);
+    }
+  } catch (e) {}
+  return null;
+}
+
+function resolveDownloadFilename(name) {
+  var base = String(name || "untitled.md").trim() || "untitled.md";
+  // Strip path separators just in case
+  base = base.split("/").pop().split("\\").pop();
+  if (/\.(md|markdown)$/i.test(base)) return base;
+  // .txt uploads / extensionless wiki files → force .md so the requirement holds
+  var dot = base.lastIndexOf(".");
+  if (dot > 0) return base.slice(0, dot) + ".md";
+  return base + ".md";
+}
+
+function triggerBlobDownload(text, filename) {
+  var blob = new Blob([text], { type: "text/markdown;charset=utf-8" });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  try {
+    a.remove();
+  } catch (e) {}
+  setTimeout(function () {
+    try {
+      URL.revokeObjectURL(url);
+    } catch (e2) {}
+  }, 1000);
+}
+
+function downloadActiveFile() {
+  var file = getActiveFileNode();
+  if (!file || file.type === "folder") {
+    try {
+      if (typeof showToast === "function") showToast("No file open to download.", "error");
+    } catch (e) {}
+    return;
+  }
+  var btn = document.getElementById("file-download-btn");
+  var origHtml = btn ? btn.innerHTML : null;
+  function setBusy(busy) {
+    if (!btn) return;
+    if (busy) {
+      btn.dataset.orig = btn.innerHTML;
+      btn.innerHTML = '<i class="ph ph-spinner-gap animate-spin text-[13px]"></i><span class="hidden sm:inline">Preparing…</span>';
+      btn.classList.add("opacity-60", "pointer-events-none");
+    } else {
+      if (btn.dataset.orig) btn.innerHTML = btn.dataset.orig;
+      else if (origHtml) btn.innerHTML = origHtml;
+      btn.classList.remove("opacity-60", "pointer-events-none");
+    }
+  }
+  function save(text) {
+    var filename = resolveDownloadFilename(file.name);
+    triggerBlobDownload(text == null ? "" : String(text), filename);
+    try {
+      if (typeof showToast === "function") showToast('Downloaded "' + filename + '".', "success");
+    } catch (e) {}
+  }
+  // Fast path: content already in memory (uploads + already-opened files)
+  if (file.content != null) {
+    save(file.content);
+    return;
+  }
+  // Slow path: lazy folder / GitHub file — fetch first
+  if (typeof readNodeContent !== "function") {
+    try {
+      if (typeof showToast === "function") showToast("Content not loaded yet. Open the file first.", "error");
+    } catch (e) {}
+    return;
+  }
+  setBusy(true);
+  readNodeContent(file).then(
+    function (text) {
+      setBusy(false);
+      // Cache so next download is instant (mirrors setActiveFile behaviour)
+      try {
+        file.content = typeof normalizeMarkdown === "function" ? normalizeMarkdown(text) : text;
+      } catch (e) {
+        file.content = text;
+      }
+      save(file.content);
+    },
+    function (err) {
+      setBusy(false);
+      console.error("Download failed", err);
+      try {
+        if (typeof showToast === "function") showToast('Could not download "' + (file.name || "file") + '".', "error");
+      } catch (e) {}
+    },
+  );
+}
+
+// Wire header download button (script loads after the DOM, so element exists)
+(function wireDownloadBtn() {
+  var btn = document.getElementById("file-download-btn");
+  if (!btn) return;
+  btn.addEventListener("click", function (e) {
+    e.stopPropagation();
+    downloadActiveFile();
+  });
+})();
