@@ -284,7 +284,7 @@ pre[class*="language-"] {
 @media (max-width: 640px) {
     code[class*="language-"],
     pre[class*="language-"] {
-        font-size: 0.72rem !important;
+        font-size: 0.62rem !important;
         line-height: 1.6;
         tab-size: 2;
     }
