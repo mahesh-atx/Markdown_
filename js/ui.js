@@ -182,6 +182,48 @@ function toggleSidebar() {
   }
 }
 
+function toggleDesktopSidebar(force) {
+  var sidebar = document.getElementById("sidebar");
+  var expandBtn = document.getElementById("desktop-expand-sidebar-btn");
+  if (!sidebar) return;
+  var isCollapsed = sidebar.classList.contains("md:hidden");
+  var shouldCollapse = typeof force === "boolean" ? force : !isCollapsed;
+  if (shouldCollapse) {
+    sidebar.classList.add("md:hidden");
+    if (expandBtn) {
+      expandBtn.classList.remove("hidden");
+      expandBtn.classList.add("md:flex");
+    }
+  } else {
+    sidebar.classList.remove("md:hidden");
+    if (expandBtn) {
+      expandBtn.classList.add("hidden");
+      expandBtn.classList.remove("md:flex");
+    }
+  }
+}
+
+(function wireDesktopSidebar() {
+  var collapseBtn = document.getElementById("desktop-collapse-btn");
+  var expandBtn = document.getElementById("desktop-expand-sidebar-btn");
+  if (collapseBtn) collapseBtn.addEventListener("click", function() { toggleDesktopSidebar(true); });
+  if (expandBtn) expandBtn.addEventListener("click", function() { toggleDesktopSidebar(false); });
+  document.addEventListener("keydown", function(e) {
+    if ((e.ctrlKey || e.metaKey) && (e.key === "b" || e.key === "B")) {
+      var target = e.target;
+      var isInput = target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable);
+      if (!isInput) {
+        e.preventDefault();
+        if (window.innerWidth >= 768) {
+          toggleDesktopSidebar();
+        } else {
+          toggleSidebar();
+        }
+      }
+    }
+  });
+})();
+
 // Current-file header: workspace + path breadcrumb above the preview.
 // file: active file node (relPath / repoPath / name). wsName: workspace label.
 function updateFileHeader(file, wsName) {

@@ -146,28 +146,28 @@ pre[class*="language-"] {
 /* Minimal thin scrollbars (sidebar, code blocks, preview) */
 .code-scroll {
     scrollbar-width: thin;
-    scrollbar-color: #333 transparent;
+    scrollbar-color: #27272a transparent;
 }
 .code-scroll::-webkit-scrollbar {
-    width: 5px;
-    height: 5px;
+    width: 4px;
+    height: 4px;
 }
 .code-scroll::-webkit-scrollbar-track {
     background: transparent;
 }
 .code-scroll::-webkit-scrollbar-thumb {
-    background: #333;
-    border-radius: 3px;
+    background: #27272a;
+    border-radius: 2px;
 }
 .code-scroll::-webkit-scrollbar-thumb:hover {
-    background: #444;
+    background: #3f3f46;
 }
 
 /* Sidebar Tree View connecting lines */
 .tree-line {
-    border-left: 1px solid #2a2a2a;
+    border-left: 1px solid #1c1c1f;
     margin-left: 7px;
-    padding-left: 8px;
+    padding-left: 7px;
 }
 
 /* Toast notifications */
@@ -217,4 +217,97 @@ pre[class*="language-"] {
 }
 .toast-success i {
     color: #4ade80;
+}
+
+/* ---- GitHub-Style Admonition Callouts ---- */
+.md-callout {
+    position: relative;
+    border-left-width: 4px;
+    border-radius: 10px;
+    transition: transform 0.15s ease;
+}
+.md-callout.md-callout-note { border-left-color: #3b82f6; }
+.md-callout.md-callout-tip { border-left-color: #10b981; }
+.md-callout.md-callout-important { border-left-color: #a855f7; }
+.md-callout.md-callout-warning { border-left-color: #f59e0b; }
+.md-callout.md-callout-caution { border-left-color: #ef4444; }
+
+.md-callout-body p:last-child {
+    margin-bottom: 0 !important;
+}
+.md-callout-body p {
+    margin-bottom: 0.65rem !important;
+    line-height: 1.65;
+}
+
+/* ---- Mermaid.js Diagram container ---- */
+.md-mermaid-card svg {
+    max-width: 100% !important;
+    height: auto !important;
+}
+
+/* ---- KaTeX Math formatting ---- */
+.katex-display {
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0.5rem 0;
+    margin: 1.25rem 0 !important;
+}
+.katex {
+    font-size: 1.05em;
+    color: #e5e7eb;
+}
+
+/* ---- Document Tabs Bar ---- */
+#tabs-bar {
+    min-height: 38px;
+}
+.doc-tab {
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.doc-tab.active {
+    background: #000000;
+    color: #ffffff;
+    border-top-color: #ff6b00;
+}
+
+/* ---- Responsive: small devices ---- */
+/* Hide multi-doc tabs bar on phones/tablets (tabs still work behind the scenes,
+   switching via sidebar). renderTabs() toggles `hidden`, so force-hide here. */
+@media (max-width: 767.98px) {
+    #tabs-bar {
+        display: none !important;
+    }
+}
+
+/* Compact code blocks on small screens so long lines rarely need h-scroll */
+@media (max-width: 640px) {
+    code[class*="language-"],
+    pre[class*="language-"] {
+        font-size: 0.72rem !important;
+        line-height: 1.6;
+        tab-size: 2;
+    }
+    #markdown-content .md-code-block {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+        border-radius: 14px;
+        max-width: 100%;
+    }
+    /* Header row (lang label + copy/run) + code padding: tighter on mobile */
+    #markdown-content .md-code-block > div:first-child {
+        padding: 0.4rem 0.6rem !important;
+    }
+    #markdown-content .md-code-block > div:last-child {
+        padding: 0.6rem 0.7rem !important;
+    }
+    #markdown-content .md-code-block pre {
+        max-width: 100%;
+    }
+    /* Inline `code` (not in pre) should wrap, never h-scroll the page */
+    #markdown-content p code,
+    #markdown-content li code {
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
 }

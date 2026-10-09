@@ -419,12 +419,122 @@ renderer.image = function(href, title, text) {
         ' loading="lazy" referrerpolicy="no-referrer" onerror="this.classList.add(\'md-img-broken\');" />';
 };
 
+// GitHub-style Callouts / Admonition Alerts (> [!NOTE], > [!TIP], > [!IMPORTANT], > [!WARNING], > [!CAUTION])
+var CALLOUT_CONFIG = {
+    note: {
+        title: 'Note',
+        icon: 'ph-fill ph-info',
+        border: 'border-blue-500/35',
+        bg: 'bg-blue-500/[0.08]',
+        titleColor: 'text-blue-400'
+    },
+    tip: {
+        title: 'Tip',
+        icon: 'ph-fill ph-lightbulb',
+        border: 'border-emerald-500/35',
+        bg: 'bg-emerald-500/[0.08]',
+        titleColor: 'text-emerald-400'
+    },
+    important: {
+        title: 'Important',
+        icon: 'ph-fill ph-bell-simple-ringing',
+        border: 'border-purple-500/35',
+        bg: 'bg-purple-500/[0.08]',
+        titleColor: 'text-purple-400'
+    },
+    warning: {
+        title: 'Warning',
+        icon: 'ph-fill ph-warning',
+        border: 'border-amber-500/35',
+        bg: 'bg-amber-500/[0.08]',
+        titleColor: 'text-amber-400'
+    },
+    caution: {
+        title: 'Caution',
+        icon: 'ph-fill ph-warning-octagon',
+        border: 'border-rose-500/35',
+        bg: 'bg-rose-500/[0.08]',
+        titleColor: 'text-rose-400'
+    }
+};
+
+renderer.blockquote = function(tokenOrQuote) {
+    var rawHtml = typeof tokenOrQuote === 'object' && tokenOrQuote !== null ? (tokenOrQuote.text || '') : tokenOrQuote;
+    if (typeof tokenOrQuote === 'object' && tokenOrQuote.tokens && this.parser && this.parser.parse) {
+        try { rawHtml = this.parser.parse(tokenOrQuote.tokens); } catch (e) {}
+    }
+    rawHtml = String(rawHtml || '').trim();
+
+    var match = rawHtml.match(/^<p>\s*\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\](?:\s*<br\s*\/?>)?([\s\S]*?)<\/p>([\s\S]*)$/i);
+    if (match) {
+        var type = match[1].toLowerCase();
+        var cfg = CALLOUT_CONFIG[type] || CALLOUT_CONFIG.note;
+        var firstP = match[2].trim();
+        var rest = match[3] || '';
+        var bodyHtml = '';
+        if (firstP) bodyHtml += '<p>' + firstP + '</p>';
+        if (rest) bodyHtml += rest;
+
+        return '<div class="md-callout md-callout-' + type + ' my-5 rounded-xl border ' + cfg.border + ' ' + cfg.bg + ' p-4 text-[#d1d5db]">' +
+            '<div class="flex items-center gap-2 font-semibold text-sm mb-2 select-none ' + cfg.titleColor + '">' +
+                '<i class="' + cfg.icon + ' text-[16px]"></i>' +
+                '<span>' + cfg.title + '</span>' +
+            '</div>' +
+            '<div class="md-callout-body text-[0.93rem] leading-relaxed">' +
+                bodyHtml +
+            '</div>' +
+        '</div>';
+    }
+
+    return '<blockquote>' + rawHtml + '</blockquote>';
+};
+
 // Override Code Block rendering
 renderer.code = function(token, legacyLanguage) {
     // Support both newer Marked.js (object token) and legacy (string)
     var rawCode = typeof token === 'object' ? token.text : token;
     var rawLang = typeof token === 'object' ? token.lang : legacyLanguage;
     var language = normalizeLang(rawLang);
+
+    // Mermaid Diagram Code Block
+    if (language === 'mermaid') {
+        var rawMermaid = (rawCode || '').trim();
+        return '<div class="md-code-block md-mermaid-card my-6 rounded-2xl border border-[#27272a] bg-[#0c0c0e] overflow-hidden">' +
+            '<div class="flex items-center justify-between px-4 py-2 border-b border-[#1c1c1f] bg-[#121214] text-xs text-[#a1a1aa]">' +
+                '<div class="flex items-center gap-2 font-medium">' +
+                    '<i class="ph ph-git-fork text-sm text-[#888]"></i>' +
+                    '<span>Mermaid Diagram</span>' +
+                '</div>' +
+                '<button class="copy-btn text-[#71717a] hover:text-white p-1 rounded hover:bg-[#1f1f23] transition-colors" title="Copy Mermaid syntax">' +
+                    '<i class="ph ph-copy text-sm"></i>' +
+                '</button>' +
+            '</div>' +
+            '<div class="p-6 flex justify-center overflow-x-auto code-scroll">' +
+                '<pre class="mermaid !bg-transparent !p-0 !m-0 !border-0 text-center">' + escapeHtml(rawMermaid) + '</pre>' +
+            '</div>' +
+            '<div class="hidden"><code class="language-mermaid">' + escapeHtml(rawMermaid) + '</code></div>' +
+        '</div>';
+    }
+
+    // LaTeX Math Code Block
+    if (language === 'math' || language === 'latex' || language === 'katex') {
+        var rawMath = (rawCode || '').trim();
+        return '<div class="md-code-block md-math-card my-6 rounded-2xl border border-[#27272a] bg-[#0c0c0e] overflow-hidden">' +
+            '<div class="flex items-center justify-between px-4 py-2 border-b border-[#1c1c1f] bg-[#121214] text-xs text-[#a1a1aa]">' +
+                '<div class="flex items-center gap-2 font-medium">' +
+                    '<i class="ph ph-function text-sm text-[#888]"></i>' +
+                    '<span>LaTeX Math</span>' +
+                '</div>' +
+                '<button class="copy-btn text-[#71717a] hover:text-white p-1 rounded hover:bg-[#1f1f23] transition-colors" title="Copy LaTeX formula">' +
+                    '<i class="ph ph-copy text-sm"></i>' +
+                '</button>' +
+            '</div>' +
+            '<div class="p-6 overflow-x-auto code-scroll text-center">' +
+                '$$\n' + escapeHtml(rawMath) + '\n$$' +
+            '</div>' +
+            '<div class="hidden"><code class="language-latex">' + escapeHtml(rawMath) + '</code></div>' +
+        '</div>';
+    }
 
     // If no language is provided, we assume it's an output/text block
     var isPlain = !language || language === 'none';
@@ -488,6 +598,54 @@ function renderMarkdown(content, fileOrResolver) {
                 if (!imgs[i].hasAttribute('referrerpolicy')) imgs[i].setAttribute('referrerpolicy', 'no-referrer');
             }
         } catch (e) { /* non-fatal */ }
+
+        // KaTeX Math Rendering (both inline $...$ and block $$...$$)
+        if (window.renderMathInElement) {
+            try {
+                renderMathInElement(document.getElementById('markdown-content'), {
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+                    throwOnError: false
+                });
+            } catch (errMath) {
+                console.warn('KaTeX render warning:', errMath);
+            }
+        }
+
+        // Mermaid.js Diagram Rendering
+        if (window.mermaid) {
+            try {
+                mermaid.initialize({
+                    startOnLoad: false,
+                    theme: 'dark',
+                    securityLevel: 'loose',
+                    themeVariables: {
+                        darkMode: true,
+                        background: '#0c0c0e',
+                        primaryColor: '#2563eb',
+                        primaryTextColor: '#f4f4f5',
+                        primaryBorderColor: '#3b82f6',
+                        lineColor: '#71717a',
+                        secondaryColor: '#1e1e24',
+                        tertiaryColor: '#121214'
+                    }
+                });
+                var mermaidNodes = document.querySelectorAll('#markdown-content .mermaid');
+                if (mermaidNodes.length > 0) {
+                    mermaid.run({ nodes: mermaidNodes }).catch(function(errM) {
+                        console.warn('Mermaid render warning:', errM);
+                    });
+                }
+            } catch (errM) {
+                console.warn('Mermaid initialize warning:', errM);
+            }
+        }
+
         // Cross-file link with #anchor: scroll once target content arrives
         try {
             if (mdPendingNav.fileId && mdCurrentFile && mdCurrentFile.id === mdPendingNav.fileId && mdPendingNav.anchor) {

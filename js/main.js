@@ -5,6 +5,7 @@
 function showWelcomeState() {
     activeFileId = null;
     try { if (typeof clearFileHeader === 'function') clearFileHeader(); } catch (e) {}
+    try { if (typeof renderTabs === 'function') renderTabs(); } catch (e) {}
     updateFileList();
     var el = document.getElementById('markdown-content');
     if (el) {

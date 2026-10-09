@@ -28,54 +28,56 @@ function renderTree(nodes, parentEl, level) {
         if (q && !__searchMatches(node, q)) return;
         visible += 1;
         var itemWrapper = document.createElement('div');
+        itemWrapper.className = 'my-[1px]';
 
         var itemRow = document.createElement('div');
-        // Styling mimicking the reference image's minimal rows
-        itemRow.className = 'flex items-center justify-between py-1.5 px-2 rounded hover:bg-[#1a1a1a] cursor-pointer group transition-colors ' + (node.id === activeFileId ? 'bg-[#151515]' : '');
+        var isActive = node.id === activeFileId;
+        // Styling: compact, proper rows with refined active state
+        itemRow.className = 'flex items-center justify-between py-1 px-1.5 rounded-md cursor-pointer group transition-all duration-150 ' +
+            (isActive ? 'bg-[#18181b] text-white shadow-sm' : 'hover:bg-[#121214] text-[#a1a1aa]');
 
         // Left section: Chevron + Icon + Name
         var leftSection = document.createElement('div');
-        leftSection.className = 'flex items-center gap-2 overflow-hidden';
-
-        // Add left padding based on depth level to create the tree structure look
-        leftSection.style.paddingLeft = (level * 2) + 'px';
+        leftSection.className = 'flex items-center gap-1.5 overflow-hidden flex-1 min-w-0';
 
         // 1. Chevron (only for folders)
         var chevron = document.createElement('div');
-        chevron.className = 'w-4 flex items-center justify-center flex-shrink-0';
+        chevron.className = 'w-3.5 flex items-center justify-center flex-shrink-0';
         if (node.type === 'folder') {
             var open = node.isOpen || !!q;
-            chevron.innerHTML = '<i class="ph-fill ph-caret-right text-[10px] text-[#666] transition-transform duration-200 ' + (open ? 'rotate-90' : '') + '"></i>';
+            chevron.innerHTML = '<i class="ph-fill ph-caret-right text-[9px] text-[#71717a] transition-transform duration-150 ' + (open ? 'rotate-90 text-[#a1a1aa]' : '') + '"></i>';
         }
         leftSection.appendChild(chevron);
 
         // 2. Icon & Name
         var iconAndName = document.createElement('div');
-        iconAndName.className = 'flex items-center gap-2 truncate';
+        iconAndName.className = 'flex items-center gap-1.5 truncate flex-1 min-w-0';
 
         var iconHtml = '';
         if (node.type === 'folder') {
-            iconHtml = '<i class="ph ph-folder text-[#888] text-[15px]"></i>';
+            var open = node.isOpen || !!q;
+            iconHtml = open
+                ? '<i class="ph ph-folder-open text-[#a1a1aa] text-[13.5px] flex-shrink-0"></i>'
+                : '<i class="ph ph-folder text-[#71717a] text-[13.5px] flex-shrink-0"></i>';
         } else {
-            // Mimic the active orange checkbox/state from the reference image
-            if (node.id === activeFileId) {
-                iconHtml = '<i class="ph-fill ph-file-text text-[#ff6b00] text-[15px]"></i>';
+            if (isActive) {
+                iconHtml = '<i class="ph-fill ph-file-text text-[#ff6b00] text-[13.5px] flex-shrink-0"></i>';
             } else {
-                iconHtml = '<i class="ph ph-file-text text-[#666] text-[15px]"></i>';
+                iconHtml = '<i class="ph ph-file-text text-[#52525b] group-hover:text-[#71717a] text-[13.5px] flex-shrink-0 transition-colors"></i>';
             }
         }
 
-        var textColorClass = node.id === activeFileId ? 'text-[#e0e0e0] font-medium' : 'text-[#a0a0a0]';
+        var textColorClass = isActive ? 'text-white font-medium' : 'text-[#a1a1aa] group-hover:text-[#e4e4e7] transition-colors';
 
         iconAndName.innerHTML =
             iconHtml +
-            '<span class="text-[13px] truncate ' + textColorClass + '">' + escapeHtml(node.name) + '</span>';
+            '<span class="text-[12px] truncate leading-tight ' + textColorClass + '">' + escapeHtml(node.name) + '</span>';
         leftSection.appendChild(iconAndName);
 
-        // Right section: Count (Numbers from the reference image)
+        // Right section: Count
         var rightSection = document.createElement('div');
-        rightSection.className = 'text-[11px] text-[#555] font-mono pr-1 opacity-0 group-hover:opacity-100 transition-opacity';
-        if (node.type === 'folder' || node.id === activeFileId) rightSection.classList.remove('opacity-0'); // Always show for active or folders
+        rightSection.className = 'text-[9.5px] text-[#52525b] font-mono pr-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0';
+        if (node.type === 'folder' || isActive) rightSection.classList.remove('opacity-0');
         rightSection.textContent = node.count !== undefined ? node.count : '';
 
         // Assemble row
@@ -100,7 +102,6 @@ function renderTree(nodes, parentEl, level) {
         var forceOpen = !!(q && node.type === 'folder');
         if (node.type === 'folder' && (node.isOpen || forceOpen) && node.children && node.children.length > 0) {
             var childrenContainer = document.createElement('div');
-            // Optional: Add the connecting vertical line for nested items
             childrenContainer.className = 'tree-line';
             renderTree(node.children, childrenContainer, level + 1);
             itemWrapper.appendChild(childrenContainer);
@@ -121,11 +122,11 @@ function updateFileList() {
     if (!roots.length) {
         if (!fileSearchQuery) {
             fileListEl.innerHTML =
-                '<p class="text-[12px] text-[#555] px-2 py-6 text-center">No content yet.<br/>Use Add content below.</p>';
+                '<div class="px-2 py-8 text-center"><i class="ph ph-folders text-2xl text-[#3f3f46] mb-1.5 block"></i><p class="text-[11.5px] text-[#71717a]">No content yet.<br/><span class="text-[10px] text-[#52525b]">Use Add content below.</span></p></div>';
         } else {
             fileListEl.innerHTML =
-                '<p class="text-[12px] text-[#555] px-2 py-6 text-center">No files match "' +
-                escapeHtml(fileSearchQuery) + '".</p>';
+                '<div class="px-2 py-8 text-center"><i class="ph ph-magnifying-glass text-2xl text-[#3f3f46] mb-1.5 block"></i><p class="text-[11.5px] text-[#71717a]">No files match "' +
+                escapeHtml(fileSearchQuery) + '".</p></div>';
         }
         if (typeof renderWorkspaceSwitcher === 'function') renderWorkspaceSwitcher();
         return;
@@ -133,8 +134,8 @@ function updateFileList() {
     var shown = renderTree(roots, fileListEl);
     if (fileSearchQuery && !shown) {
         fileListEl.innerHTML =
-            '<p class="text-[12px] text-[#555] px-2 py-6 text-center">No files match "' +
-            escapeHtml(fileSearchQuery) + '".</p>';
+            '<div class="px-2 py-8 text-center"><i class="ph ph-magnifying-glass text-2xl text-[#3f3f46] mb-1.5 block"></i><p class="text-[11.5px] text-[#71717a]">No files match "' +
+            escapeHtml(fileSearchQuery) + '".</p></div>';
     }
     if (typeof renderWorkspaceSwitcher === 'function') renderWorkspaceSwitcher();
 }
@@ -153,7 +154,7 @@ function updateFileList() {
     }
     function setToggleActive(active) {
         if (!toggleBtn) return;
-        toggleBtn.classList.toggle('bg-[#1a1a1a]', active);
+        toggleBtn.classList.toggle('bg-[#18181b]', active);
         toggleBtn.classList.toggle('text-white', active);
     }
     function isWrapVisible() {
@@ -273,6 +274,7 @@ function setActiveFile(id) {
     }
     var file = findFileById(fileSystem, id);
     if (file && file.type !== 'folder') {
+        if (typeof addTab === 'function') addTab(id);
         __updateFileHeaderFor(file);
         if (file.content) {
             renderMarkdown(file.content, file);
@@ -300,6 +302,7 @@ function setActiveFile(id) {
         try { if (typeof clearFileHeader === 'function') clearFileHeader(); } catch (e) {}
     }
     updateFileList();
+    if (typeof renderTabs === 'function') renderTabs();
 
     // Close sidebar automatically on mobile after a file is selected
     if (window.innerWidth < 768 && typeof toggleSidebar === 'function') {

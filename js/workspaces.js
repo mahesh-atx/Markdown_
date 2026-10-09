@@ -163,6 +163,12 @@ function removeWorkspace(id) {
     fileSystem.splice(idx, 1);
     persistGithubWorkspaces();
     if (typeof saveLocalWorkspaces === 'function') saveLocalWorkspaces();
+    if (typeof openTabs !== 'undefined') {
+        openTabs = openTabs.filter(function(fid) {
+            return typeof findFileById === 'function' ? !!findFileById(fileSystem, fid) : false;
+        });
+        if (typeof renderTabs === 'function') renderTabs();
+    }
     if (fileSystem.length === 0) {
         activeWorkspaceId = null;
         activeFileId = null;
@@ -188,32 +194,32 @@ function renderWorkspaceSwitcher() {
     el.classList.remove('hidden');
     el.innerHTML = '';
     var label = document.createElement('div');
-    label.className = 'text-[10px] uppercase tracking-wider text-[#555] px-2 pb-1';
+    label.className = 'text-[9.5px] font-semibold uppercase tracking-wider text-[#71717a] px-1.5 pb-1 flex items-center justify-between';
     label.textContent = fileSystem.length > 1 ? 'Workspaces (' + fileSystem.length + ')' : 'Workspace';
     el.appendChild(label);
     fileSystem.forEach(function(ws) {
         var isActive = ws.id === activeWorkspaceId;
         var row = document.createElement('div');
-        row.className = 'flex items-center gap-1 px-1 py-0.5 rounded cursor-pointer transition-colors ' +
-            (isActive ? 'bg-[#1a1a1a]' : 'hover:bg-[#141414]');
+        row.className = 'flex items-center gap-1 px-1.5 py-0.5 rounded-md cursor-pointer transition-colors ' +
+            (isActive ? 'bg-[#18181b] text-white font-medium' : 'hover:bg-[#121214] text-[#a1a1aa]');
         var icon = 'ph-folder';
         if (ws._kind === 'github') icon = 'ph-github-logo';
         else if (ws._kind === 'uploads') icon = 'ph-upload-simple';
         var btn = document.createElement('div');
-        btn.className = 'flex items-center gap-2 flex-1 min-w-0 px-1.5 py-1';
+        btn.className = 'flex items-center gap-1.5 flex-1 min-w-0 py-0.5';
         btn.title = ws.name || '';
-        btn.innerHTML = '<i class="ph ' + icon + ' text-[14px] flex-shrink-0 ' +
-            (isActive ? 'text-white' : 'text-[#777]') + '"></i>' +
-            '<span class="text-[12px] truncate ' + (isActive ? 'text-white font-medium' : 'text-[#999]') + '">' +
+        btn.innerHTML = '<i class="ph ' + icon + ' text-[13px] flex-shrink-0 ' +
+            (isActive ? 'text-white' : 'text-[#71717a]') + '"></i>' +
+            '<span class="text-[11.5px] truncate ' + (isActive ? 'text-white font-medium' : 'text-[#a1a1aa]') + '">' +
             escapeHtml(ws.name || 'Untitled') + '</span>' +
-            (ws._disconnected ? '<span class="text-[9px] uppercase tracking-wider text-[#f0a35e] border border-[#5a3a1a] rounded px-1 ml-1 flex-shrink-0">reconnect</span>' : '') +
-            (ws.count !== undefined ? '<span class="text-[10px] text-[#555] font-mono ml-auto flex-shrink-0">' + ws.count + '</span>' : '');
+            (ws._disconnected ? '<span class="text-[8.5px] uppercase tracking-wider text-[#f0a35e] border border-[#5a3a1a] rounded px-1 ml-1 flex-shrink-0">reconnect</span>' : '') +
+            (ws.count !== undefined ? '<span class="text-[9.5px] text-[#52525b] font-mono ml-auto flex-shrink-0">' + ws.count + '</span>' : '');
         btn.addEventListener('click', function() { setActiveWorkspace(ws.id); });
         row.appendChild(btn);
         var x = document.createElement('button');
-        x.className = 'text-[#555] hover:text-white p-1 rounded hover:bg-[#2a2a2a] transition-colors flex-shrink-0';
+        x.className = 'text-[#52525b] hover:text-white p-0.5 rounded hover:bg-[#27272a] transition-colors flex-shrink-0';
         x.title = 'Remove "' + (ws.name || '') + '"';
-        x.innerHTML = '<i class="ph ph-x text-[12px]"></i>';
+        x.innerHTML = '<i class="ph ph-x text-[10px]"></i>';
         x.addEventListener('click', function(e) { e.stopPropagation(); removeWorkspace(ws.id); });
         row.appendChild(x);
         el.appendChild(row);
